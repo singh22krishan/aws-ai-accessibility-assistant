@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS AI Accessibility Assistant</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f5f7fb; margin: 0; min-height: 100vh; display: grid; place-items: center; }
+    main { width: min(92vw, 520px); background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 12px 40px rgba(0,0,0,.08); }
+    h1 { margin-top: 0; }
+    label { display:block; margin-top:1rem; font-weight:600; }
+    input, select, button { box-sizing:border-box; width:100%; margin-top:.45rem; padding:.75rem; }
+    button { cursor:pointer; font-weight:700; }
+    button:disabled { cursor:not-allowed; opacity:.65; }
+    #error { color:#b42318; min-height:1.4rem; }
+    #description { white-space:pre-wrap; margin-top:1rem; }
+    audio { width:100%; margin-top:1rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>AWS AI Accessibility Assistant</h1>
+  <p>Upload a JPEG or PNG to generate an AI-assisted description and spoken audio.</p>
+
+  <label for="imageInput">Image</label>
+  <input id="imageInput" type="file" accept="image/jpeg,image/png" />
+
+  <label for="languageSelect">Audio language</label>
+  <select id="languageSelect">
+    <option value="en">English</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
+    <option value="hi">Hindi</option>
+  </select>
+
+  <button id="submitButton">Generate description & audio</button>
+  <p id="error" role="alert"></p>
+  <p id="description"></p>
+  <div id="audioContainer"></div>
+</main>
+
+<script src="config.js"></script>
+<script>
+  const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) || "http://127.0.0.1:8000";
+  const imageInput = document.getElementById("imageInput");
+  const languageSelect = document.getElementById("languageSelect");
+  const submitButton = document.getElementById("submitButton");
+  const error = document.getElementById("error");
+  const description = document.getElementById("description");
+  const audioContainer = document.getElementById("audioContainer");
+
+  submitButton.addEventListener("click", async () => {
+    const file = imageInput.files[0];
+    if (!file) { error.textContent = "Choose an image first."; return; }
+    if (!["image/jpeg", "image/png"].includes(file.type)) { error.textContent = "Only JPEG and PNG images are supported."; return; }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("language", languageSelect.value);
+
+    submitButton.disabled = true;
+    error.textContent = "";
+    description.textContent = "";
+    audioContainer.innerHTML = "";
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload`, { method: "POST", body: formData });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Request failed");
+
+      description.textContent = body.description;
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.src = body.audioUrl;
+      audioContainer.appendChild(audio);
+    } catch (e) {
+      error.textContent = e.message || "Processing failed.";
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
