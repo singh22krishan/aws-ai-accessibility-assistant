@@ -1,0 +1,17 @@
+{
+  "Rules": [
+    {
+      "ID": "DeleteGeneratedAudio",
+      "Status": "Enabled",
+      "Filter": {
+        "Tag": {
+          "Key": "auto-delete",
+          "Value": "true"
+        }
+      },
+      "Expiration": {
+        "Days": 1
+      }
+    }
+  ]
+}
