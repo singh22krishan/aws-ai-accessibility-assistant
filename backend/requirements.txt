@@ -1,3 +1,2 @@
 chalice
 boto3
-pytest>=8,<9
