@@ -1,5 +1,7 @@
 # AWS AI Accessibility Assistant
 
+[![Python Verification](https://github.com/singh22krishan/aws-ai-accessibility-assistant/actions/workflows/python-check.yml/badge.svg)](https://github.com/singh22krishan/aws-ai-accessibility-assistant/actions/workflows/python-check.yml)
+
 A serverless accessibility-focused application that turns an uploaded image into a generated description and spoken MP3 using managed AWS AI services.
 
 ## Architecture
